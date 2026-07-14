@@ -80,4 +80,19 @@ test.describe('Terminal UI', () => {
     // The input should retain the invalid command for easy correction
     await expect(input).toHaveValue(invalidCommand);
   });
+
+  test('reference decode/encode commands work in live terminal', async ({ page }) => {
+    await page.goto('/');
+    const input = page.getByTestId('terminal-input');
+
+    // Decode airline
+    await input.fill('DACQR');
+    await input.press('Enter');
+    await expect(page.locator('text=QR - QATAR AIRWAYS (ONEWORLD)')).toBeVisible();
+
+    // Encode city
+    await input.fill('EANDoha');
+    await input.press('Enter');
+    await expect(page.locator('text=DOH - HAMAD INTERNATIONAL, DOHA, QA')).toBeVisible();
+  });
 });

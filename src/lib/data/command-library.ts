@@ -4,7 +4,8 @@ export type CommandCategory =
   | 'PNR'
   | 'Fare/Pricing'
   | 'Ticketing'
-  | 'Cancellation/Refund';
+  | 'Cancellation/Refund'
+  | 'Reference/Decode';
 
 export interface CommandLibraryEntry {
   id: string;
@@ -142,5 +143,32 @@ export const commandLibraryData: CommandLibraryEntry[] = [
     description: 'Calculates and processes a refund for a ticketed PNR with cancelled segments, applying fare rules (penalties).',
     exampleInput: 'REFUND',
     expectedOutput: 'REFUND USD 267.00\nSTATUS REFUNDED'
+  },
+  {
+    id: 'dac',
+    category: 'Reference/Decode',
+    command: 'DAC',
+    syntax: 'DAC[AIRLINE_CODE]',
+    description: 'Decodes a 2-letter airline code into full name and alliance.',
+    exampleInput: 'DACQR',
+    expectedOutput: 'QR - QATAR AIRWAYS (ONEWORLD)'
+  },
+  {
+    id: 'dan',
+    category: 'Reference/Decode',
+    command: 'DAN',
+    syntax: 'DAN[AIRPORT_CODE]',
+    description: 'Decodes a 3-letter airport or city code into full name, city, and country.',
+    exampleInput: 'DANBLR',
+    expectedOutput: 'BLR - KEMPEGOWDA INTERNATIONAL, BENGALURU, IN'
+  },
+  {
+    id: 'ean',
+    category: 'Reference/Decode',
+    command: 'EAN',
+    syntax: 'EAN[NAME]',
+    description: 'Encodes a partial or full city/airport name into matching 3-letter code(s).',
+    exampleInput: 'EANDOHA',
+    expectedOutput: 'DOH - HAMAD INTERNATIONAL, DOHA, QA'
   }
 ];

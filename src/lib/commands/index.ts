@@ -12,11 +12,17 @@ import { ticketingCommand } from './ticketing';
 import { ticketIssueCommand } from './ticket-issue';
 import { ticketVoidCommand } from './ticket-void';
 import { cancelSegmentCommand } from './cancel-segment';
+import { dacCommand } from './dac';
+import { danCommand } from './dan';
+import { eanCommand } from './ean';
 import type { CommandHandler } from './types';
 
 export const commandHandlers: CommandHandler[] = [
   helpCommand,
   availabilityCommand,
+  dacCommand,
+  danCommand,
+  eanCommand,
   sellSegmentCommand,
   nameCommand,
   contactCommand,
