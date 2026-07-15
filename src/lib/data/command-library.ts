@@ -170,5 +170,104 @@ export const commandLibraryData: CommandLibraryEntry[] = [
     description: 'Encodes a partial or full city/airport name into matching 3-letter code(s).',
     exampleInput: 'EANDOHA',
     expectedOutput: 'DOH - HAMAD INTERNATIONAL, DOHA, QA'
+  },
+  {
+    id: 'dna-name',
+    category: 'Reference/Decode',
+    command: 'DNA',
+    syntax: 'DNA[AIRLINE_NAME]',
+    description: 'Encodes an airline name to its 2-letter code.',
+    exampleInput: 'DNAQATAR',
+    expectedOutput: 'QATAR AIRWAYS - QR (157)'
+  },
+  {
+    id: 'dna-code',
+    category: 'Reference/Decode',
+    command: 'DNA',
+    syntax: 'DNA[AIRLINE_CODE]',
+    description: 'Decodes a 2-letter airline code to its name.',
+    exampleInput: 'DNAQR',
+    expectedOutput: 'QR - QATAR AIRWAYS (ONEWORLD)'
+  },
+  {
+    id: 'dna-ticket',
+    category: 'Reference/Decode',
+    command: 'DNA',
+    syntax: 'DNA[TICKET_PREFIX]',
+    description: 'Decodes a numeric ticket designator to its airline.',
+    exampleInput: 'DNA157',
+    expectedOutput: '157 - QR - QATAR AIRWAYS'
+  },
+  {
+    id: 'dc-name',
+    category: 'Reference/Decode',
+    command: 'DC',
+    syntax: 'DC[COUNTRY_NAME]',
+    description: 'Encodes a country name to its 2-letter code.',
+    exampleInput: 'DCFRANCE',
+    expectedOutput: 'FRANCE - FR'
+  },
+  {
+    id: 'dc-code',
+    category: 'Reference/Decode',
+    command: 'DC',
+    syntax: 'DC[COUNTRY_CODE]',
+    description: 'Decodes a 2-letter country code to its name.',
+    exampleInput: 'DCFR',
+    expectedOutput: 'FR - FRANCE'
+  },
+  {
+    id: 'ggalliance',
+    category: 'Reference/Decode',
+    command: 'GGALLIANCE',
+    syntax: 'GGALLIANCE',
+    description: 'Lists all Oneworld alliance airlines.',
+    exampleInput: 'GGALLIANCE',
+    expectedOutput: 'ONEWORLD ALLIANCE CARRIERS:\nQR - QATAR AIRWAYS\nBA - BRITISH AIRWAYS\nAA - AMERICAN AIRLINES'
+  },
+  {
+    id: 'gpow',
+    category: 'Reference/Decode',
+    command: 'GPOW',
+    syntax: 'GPOW',
+    description: 'Lists all Oneworld alliance airlines.',
+    exampleInput: 'GPOW',
+    expectedOutput: 'ONEWORLD ALLIANCE CARRIERS:\nQR - QATAR AIRWAYS\nBA - BRITISH AIRWAYS\nAA - AMERICAN AIRLINES'
+  },
+  {
+    id: 'gpsa',
+    category: 'Reference/Decode',
+    command: 'GPSA',
+    syntax: 'GPSA',
+    description: 'Lists all Star Alliance airlines.',
+    exampleInput: 'GPSA',
+    expectedOutput: 'STAR ALLIANCE CARRIERS:\nUA - UNITED AIRLINES'
+  },
+  {
+    id: 'gga',
+    category: 'Reference/Decode',
+    command: 'GGA',
+    syntax: 'GGA[AIRLINE_CODE]',
+    description: 'Displays a detailed information page for an airline.',
+    exampleInput: 'GGAQR',
+    expectedOutput: 'AIRLINE INFORMATION - QR\nNAME: QATAR AIRWAYS\nALLIANCE: ONEWORLD\n...'
+  },
+  {
+    id: 'ggcou',
+    category: 'Reference/Decode',
+    command: 'GGCOU',
+    syntax: 'GGCOU[COUNTRY_CODE]',
+    description: 'Displays a detailed information page for a country.',
+    exampleInput: 'GGCOUFR',
+    expectedOutput: 'COUNTRY INFORMATION - FR\nNAME: FRANCE\nISO CODE: FR'
+  },
+  {
+    id: 'ggpca',
+    category: 'Reference/Decode',
+    command: 'GGPCA',
+    syntax: 'GGPCA[AIRLINE_CODE]',
+    description: 'Checks if an airline is a participating carrier.',
+    exampleInput: 'GGPCAQR',
+    expectedOutput: 'QR IS A PARTICIPATING CARRIER'
   }
 ];

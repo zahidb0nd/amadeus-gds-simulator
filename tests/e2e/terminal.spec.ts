@@ -95,4 +95,25 @@ test.describe('Terminal UI', () => {
     await input.press('Enter');
     await expect(page.locator('text=DOH - HAMAD INTERNATIONAL, DOHA, QA')).toBeVisible();
   });
+
+  test('extended reference commands (Phase A) work in live terminal', async ({ page }) => {
+    await page.goto('/');
+    const input = page.getByTestId('terminal-input');
+
+    // DNA
+    await input.fill('DNAQR');
+    await input.press('Enter');
+    await expect(page.locator('text=QR - QATAR AIRWAYS (ONEWORLD)')).toBeVisible();
+
+    // DC
+    await input.fill('DCFRANCE');
+    await input.press('Enter');
+    await expect(page.locator('text=FRANCE - FR')).toBeVisible();
+
+    // GPOW
+    await input.fill('GPOW');
+    await input.press('Enter');
+    await expect(page.locator('text=ONEWORLD ALLIANCE CARRIERS:')).toBeVisible();
+    await expect(page.locator('text=QR - QATAR AIRWAYS')).toBeVisible();
+  });
 });

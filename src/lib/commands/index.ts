@@ -15,6 +15,9 @@ import { cancelSegmentCommand } from './cancel-segment';
 import { dacCommand } from './dac';
 import { danCommand } from './dan';
 import { eanCommand } from './ean';
+import { dnaCommand } from './dna';
+import { dcCommand } from './dc';
+import { ggCommand } from './gg';
 import type { CommandHandler } from './types';
 
 export const commandHandlers: CommandHandler[] = [
@@ -23,6 +26,9 @@ export const commandHandlers: CommandHandler[] = [
   dacCommand,
   danCommand,
   eanCommand,
+  dnaCommand,
+  dcCommand,
+  ggCommand,
   sellSegmentCommand,
   nameCommand,
   contactCommand,
