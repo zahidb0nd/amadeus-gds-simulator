@@ -14,9 +14,18 @@ const helpOutput = [
   'TTV                        VOID TICKET',
   'XI[SEGMENT]                CANCEL SEGMENT',
   'REFUND                     PROCESS REFUND',
+  'DAC[AIRLINE]               DECODE AIRLINE CODE',
+  'DAN[AIRPORT]               DECODE AIRPORT CODE',
+  'EAN[CITY/AIRPORT]          ENCODE CITY/AIRPORT NAME',
+  'DNA[AIRLINE/PREFIX]        ENCODE/DECODE AIRLINE',
+  'DC[COUNTRY]                ENCODE/DECODE COUNTRY',
+  'GGALLIANCE / GPOW / GPSA   LIST ALLIANCE CARRIERS',
+  'GGA[AIRLINE]               AIRLINE INFO PAGE',
+  'GGCOU[COUNTRY]             COUNTRY INFO PAGE',
+  'GGPCA[AIRLINE]             PARTICIPATING CARRIER CHECK',
   'IG                         IGNORE WORKAREA',
   'ER                         END AND RETRIEVE',
-  'HELP                      SHOW COMMAND LIST'
+  'HELP                       SHOW COMMAND LIST'
 ].join('\n');
 
 export const helpCommand: CommandHandler = {
