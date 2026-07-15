@@ -2,6 +2,7 @@ import { dacCommand } from '@/lib/commands/dac';
 import { danCommand } from '@/lib/commands/dan';
 import { eanCommand } from '@/lib/commands/ean';
 import type { CommandHandlerContext } from '@/lib/commands/types';
+import { dcCommand } from '@/lib/commands/dc';
 
 describe('Reference Decode/Encode Commands', () => {
   const createCtx = (input: string): CommandHandlerContext => ({
@@ -75,5 +76,37 @@ describe('Reference Decode/Encode Commands', () => {
       expect(result.ok).toBe(false);
       expect(result.output).toBe('NOT FOUND');
     });
+
+    it('should encode a newly imported airport city name (JFK / New York)', () => {
+      expect(eanCommand.match('EANNEW YORK')).toBe(true);
+      const result = eanCommand.execute(createCtx('EANNEW YORK'));
+      expect(result.ok).toBe(true);
+      expect(result.output).toContain('JFK');
+    });
+  });
+
+  describe('New Database Lookups', () => {
+    it('should decode newly imported airport codes', () => {
+      const resultJfk = danCommand.execute(createCtx('DANJFK'));
+      expect(resultJfk.ok).toBe(true);
+      expect(resultJfk.output).toBe('JFK - JOHN F KENNEDY INTERNATIONAL, NEW YORK, US');
+
+      const resultKef = danCommand.execute(createCtx('DANKEF'));
+      expect(resultKef.ok).toBe(true);
+      expect(resultKef.output).toBe('KEF - KEFLAVIK NAS, KEFLAVIK, IS');
+    });
+
+    it('should decode/encode newly imported countries', () => {
+      // Decode country code
+      const resultGl = dcCommand.execute(createCtx('DCGL'));
+      expect(resultGl.ok).toBe(true);
+      expect(resultGl.output).toBe('GL - GREENLAND');
+
+      // Encode country name
+      const resultGreenland = dcCommand.execute(createCtx('DCGREENLAND'));
+      expect(resultGreenland.ok).toBe(true);
+      expect(resultGreenland.output).toBe('GREENLAND - GL');
+    });
   });
 });
+
