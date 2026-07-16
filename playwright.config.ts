@@ -1,7 +1,8 @@
-const { defineConfig } = require('@playwright/test');
+import { defineConfig } from '@playwright/test';
 
-module.exports = defineConfig({
+export default defineConfig({
   testDir: './tests/e2e',
+  globalSetup: require.resolve('./e2e/global-setup.ts'),
   timeout: 30000,
   use: {
     baseURL: 'http://localhost:3000'
