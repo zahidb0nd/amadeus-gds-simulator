@@ -1,23 +1,71 @@
 import { ObjectId } from 'mongodb';
 
-export interface Passenger {
-  firstName: string;
-  lastName: string;
-  title: 'MR' | 'MRS' | 'MS' | 'CHD' | 'INF';
-}
+export type PnrName = {
+  surname: string;
+  firstname: string;
+  title?: string;
+};
 
-export interface FlightSegment {
+export type PnrSegment = {
+  segmentRef: number;
   airline: string;
   flightNumber: string;
-  departureAirport: string;
-  arrivalAirport: string;
-  departureDate: string;
-  status: 'HK' | 'TK' | 'HX';
-}
+  bookingClass: string;
+  quantity: number;
+  origin: string;
+  destination: string;
+  departure: string;
+  arrival: string;
+  status: 'KK' | 'XX';
+};
 
-export interface PnrDocument {
+export type FareTax = {
+  code: string;
+  amount: number;
+};
+
+export type TstQuote = {
+  route: string;
+  bookingClass: string;
+  fareBasis: string;
+  baseFare: number;
+  taxes: FareTax[];
+  total: number;
+  currency: string;
+  refundable: boolean;
+  penalty: number;
+};
+
+export type TicketDocument = {
+  number: string;
+  status: 'ISSUED' | 'VOIDED';
+  issuedAt: Date;
+  voidedAt?: Date;
+};
+
+export type PnrDraft = {
+  names: PnrName[];
+  segments: PnrSegment[];
+  contact?: string;
+  ticketingArrangement?: string;
+  tst?: TstQuote;
+};
+
+export type PnrDocument = {
   _id?: ObjectId;
-  pnrLocator: string;
-  passengers: Passenger[];
-  segments: FlightSegment[];
-}
+  recordLocator: string;
+  sessionId: string;
+  names: PnrName[];
+  itinerary: PnrSegment[];
+  contact?: string;
+  ticketingArrangement?: string;
+  tst?: TstQuote;
+  ticket?: TicketDocument;
+  refund?: {
+    amount: number;
+    currency: string;
+    processedAt: Date;
+  };
+  status: 'ACTIVE' | 'TICKETED' | 'CANCELLED' | 'REFUNDED';
+  createdAt: Date;
+};

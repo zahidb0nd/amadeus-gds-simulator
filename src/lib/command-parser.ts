@@ -38,6 +38,12 @@ export function tokenizeCommand(input: string): ParsedCommand | null {
   } else if (normalizedInput.startsWith('DC')) {
     commandToken = 'DC';
     argument = normalizedInput.slice(2).trim();
+  } else if (normalizedInput.startsWith('DD')) {
+    commandToken = 'DD';
+    argument = normalizedInput.slice(2).trim();
+  } else if (normalizedInput.startsWith('DF')) {
+    commandToken = 'DF';
+    argument = normalizedInput.slice(2).trim();
   } else {
     commandToken = normalizedInput.split(/\s+/)[0];
     argument = normalizedInput.slice(commandToken.length).trim();

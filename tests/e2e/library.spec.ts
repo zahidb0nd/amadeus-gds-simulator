@@ -7,8 +7,8 @@ test.describe('Command Library', () => {
     // Check if the title is present
     await expect(page.locator('h1')).toContainText('Command Library');
     
-    // All 28 commands should be visible initially
-    await expect(page.locator('text=Try it')).toHaveCount(28);
+    // All 32 commands should be visible initially
+    await expect(page.locator('text=Try it')).toHaveCount(32);
     
     // Filter by Ticketing
     await page.click('button:has-text("Ticketing")');

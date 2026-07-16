@@ -18,6 +18,8 @@ import { eanCommand } from './ean';
 import { dnaCommand } from './dna';
 import { dcCommand } from './dc';
 import { ggCommand } from './gg';
+import { ddCommand } from './dd';
+import { dfCommand } from './df';
 import type { CommandHandler } from './types';
 
 export const commandHandlers: CommandHandler[] = [
@@ -29,6 +31,8 @@ export const commandHandlers: CommandHandler[] = [
   dnaCommand,
   dcCommand,
   ggCommand,
+  ddCommand,
+  dfCommand,
   sellSegmentCommand,
   nameCommand,
   contactCommand,

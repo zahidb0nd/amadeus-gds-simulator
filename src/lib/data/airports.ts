@@ -6,6 +6,7 @@ export type Airport = {
   latDec?: number;
   lonDec?: number;
   altitude?: number;
+  timezone?: string;
 };
 
 export const airports: Airport[] = [

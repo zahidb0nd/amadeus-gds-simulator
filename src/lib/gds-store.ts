@@ -2,6 +2,15 @@ import { randomBytes } from 'crypto';
 import { getMongoClient } from './mongodb';
 import { airports, type Airport } from './data/airports';
 import { flights } from './data/flights';
+import {
+  type PnrName,
+  type PnrSegment,
+  type FareTax,
+  type TstQuote,
+  type TicketDocument,
+  type PnrDraft,
+  type PnrDocument
+} from '../types/pnr';
 
 export type AvailabilityContextLine = {
   lineNumber: number;
@@ -16,42 +25,6 @@ export type AvailabilityContextLine = {
   date: string;
 };
 
-export type PnrName = {
-  surname: string;
-  firstname: string;
-  title?: string;
-};
-
-export type PnrSegment = {
-  segmentRef: number;
-  airline: string;
-  flightNumber: string;
-  bookingClass: string;
-  quantity: number;
-  origin: string;
-  destination: string;
-  departure: string;
-  arrival: string;
-  status: 'KK' | 'XX';
-};
-
-export type FareTax = {
-  code: string;
-  amount: number;
-};
-
-export type TstQuote = {
-  route: string;
-  bookingClass: string;
-  fareBasis: string;
-  baseFare: number;
-  taxes: FareTax[];
-  total: number;
-  currency: string;
-  refundable: boolean;
-  penalty: number;
-};
-
 export type FareDocument = {
   origin: string;
   destination: string;
@@ -62,21 +35,6 @@ export type FareDocument = {
   taxes: FareTax[];
   refundable: boolean;
   penalty: number;
-};
-
-export type TicketDocument = {
-  number: string;
-  status: 'ISSUED' | 'VOIDED';
-  issuedAt: Date;
-  voidedAt?: Date;
-};
-
-export type PnrDraft = {
-  names: PnrName[];
-  segments: PnrSegment[];
-  contact?: string;
-  ticketingArrangement?: string;
-  tst?: TstQuote;
 };
 
 export type FlightDocument = {
@@ -98,23 +56,6 @@ export type SessionState = {
   updatedAt: Date;
 };
 
-export type PnrDocument = {
-  recordLocator: string;
-  sessionId: string;
-  names: PnrName[];
-  itinerary: PnrSegment[];
-  contact?: string;
-  ticketingArrangement?: string;
-  tst?: TstQuote;
-  ticket?: TicketDocument;
-  refund?: {
-    amount: number;
-    currency: string;
-    processedAt: Date;
-  };
-  status: 'ACTIVE' | 'TICKETED' | 'CANCELLED' | 'REFUNDED';
-  createdAt: Date;
-};
 
 const memorySessions = new Map<string, SessionState>();
 const memoryPnrs = new Map<string, PnrDocument>();
@@ -219,6 +160,35 @@ export async function ensureFareSeeds(): Promise<void> {
   }
 }
 
+const airportTimezones: Record<string, string> = {
+  BLR: 'Asia/Kolkata',
+  DEL: 'Asia/Kolkata',
+  BOM: 'Asia/Kolkata',
+  DOH: 'Asia/Qatar',
+  LAX: 'America/Los_Angeles',
+  SFO: 'America/Los_Angeles',
+  JFK: 'America/New_York',
+  LHR: 'Europe/London',
+  CDG: 'Europe/Paris',
+  DXB: 'Asia/Dubai',
+  HND: 'Asia/Tokyo',
+  NRT: 'Asia/Tokyo',
+  SIN: 'Asia/Singapore',
+  SYD: 'Australia/Sydney',
+};
+
+const countryTimezones: Record<string, string> = {
+  IN: 'Asia/Kolkata',
+  QA: 'Asia/Qatar',
+  US: 'America/New_York',
+  GB: 'Europe/London',
+  FR: 'Europe/Paris',
+  AE: 'Asia/Dubai',
+  JP: 'Asia/Tokyo',
+  SG: 'Asia/Singapore',
+  AU: 'Australia/Sydney',
+};
+
 export async function ensureAirportSeeds(): Promise<void> {
   if (!useMongoBackend()) {
     return;
@@ -228,8 +198,40 @@ export async function ensureAirportSeeds(): Promise<void> {
   const count = await airportsCollection.countDocuments({});
 
   if (count === 0) {
-    // Insert in batches if needed, but native driver handles large arrays reasonably well
-    await airportsCollection.insertMany(airports as any[]);
+    const seededAirports = airports.map(a => {
+      const tz = airportTimezones[a.code.toUpperCase()] || countryTimezones[a.country.toUpperCase()] || 'UTC';
+      return { ...a, timezone: tz };
+    });
+    await airportsCollection.insertMany(seededAirports as any[]);
+  } else {
+    const sample = await airportsCollection.findOne({ code: 'BLR' });
+    if (sample && !('timezone' in sample)) {
+      const bulkOps: any[] = [];
+      for (const [code, tz] of Object.entries(airportTimezones)) {
+        bulkOps.push({
+          updateOne: {
+            filter: { code },
+            update: { $set: { timezone: tz } }
+          }
+        });
+      }
+      for (const [country, tz] of Object.entries(countryTimezones)) {
+        bulkOps.push({
+          updateMany: {
+            filter: { country, timezone: { $exists: false } },
+            update: { $set: { timezone: tz } }
+          }
+        });
+      }
+      bulkOps.push({
+        updateMany: {
+          filter: { timezone: { $exists: false } },
+          update: { $set: { timezone: 'UTC' } }
+        }
+      });
+      await airportsCollection.bulkWrite(bulkOps);
+      console.log('Successfully migrated airports collection with timezones.');
+    }
   }
 }
 
@@ -237,7 +239,12 @@ export async function findAirportByCode(code: string): Promise<Airport | null> {
   const normalizedCode = code.toUpperCase();
 
   if (!useMongoBackend()) {
-    return airports.find(a => a.code === normalizedCode) ?? null;
+    const a = airports.find(a => a.code === normalizedCode) ?? null;
+    if (a) {
+      const tz = airportTimezones[normalizedCode] || countryTimezones[a.country.toUpperCase()] || 'UTC';
+      return { ...a, timezone: tz };
+    }
+    return null;
   }
 
   await ensureAirportSeeds();

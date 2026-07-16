@@ -116,4 +116,51 @@ test.describe('Terminal UI', () => {
     await expect(page.locator('text=ONEWORLD ALLIANCE CARRIERS:')).toBeVisible();
     await expect(page.locator('text=QR - QATAR AIRWAYS').first()).toBeVisible();
   });
+
+  test('retrieves a seeded PNR by its record locator from the isolated database', async ({ page }) => {
+    await page.goto('/');
+    const input = page.getByTestId('terminal-input');
+
+    // Submit PNR retrieval command for seeded PNR Y7B9XZ
+    await input.fill('RTY7B9XZ');
+    await input.press('Enter');
+
+    // Verify response outputs details of the seeded PNR
+    await expect(page.locator('body')).toContainText('Y7B9XZ');
+    await expect(page.locator('body')).toContainText('DOE/JOHN');
+    await expect(page.locator('body')).toContainText('AA  100');
+    await expect(page.locator('body')).toContainText('LAX JFK');
+  });
+
+  test('date/time and math utilities (Phase B) work in live terminal', async ({ page }) => {
+    await page.goto('/');
+    const input = page.getByTestId('terminal-input');
+
+    // Test DDDEL city time lookup
+    await input.fill('DDDEL');
+    await input.press('Enter');
+    await expect(page.locator('body')).toContainText('DELHI');
+    await expect(page.locator('body')).toContainText('IN');
+
+    // Test DD23JUN day of week calculation (e.g. June 23, 2026 is Tuesday)
+    await input.fill('DD23JUN26');
+    await input.press('Enter');
+    await expect(page.locator('body')).toContainText('TUESDAY');
+
+    // Test date math DD15JUL26+10
+    await input.fill('DD15JUL26+10');
+    await input.press('Enter');
+    await expect(page.locator('body')).toContainText('15JUL26 + 10D = 25JUL26 SATURDAY');
+
+    // Test math addition DF10;5
+    await input.fill('DF10;5');
+    await input.press('Enter');
+    await expect(page.locator('body')).toContainText('10 + 5 = 15');
+
+    // Test math division and divide-by-zero DF10/0
+    await input.fill('DF10/0');
+    await input.press('Enter');
+    await expect(page.locator('body')).toContainText('DIVISION BY ZERO');
+  });
 });
+

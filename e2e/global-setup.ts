@@ -21,7 +21,7 @@ async function globalSetup() {
 
   try {
     await client.connect();
-    const db = client.db();
+    const db = client.db('amadeus_test');
 
     // Test collection
     const collection = db.collection<PnrDocument>('pnrs');
@@ -32,45 +32,63 @@ async function globalSetup() {
     // Seed test collection
     const seedData: PnrDocument[] = [
       {
-        pnrLocator: 'Y7B9XZ',
-        passengers: [
-          { firstName: 'JOHN', lastName: 'DOE', title: 'MR' }
+        recordLocator: 'Y7B9XZ',
+        sessionId: 'seed-session-1',
+        names: [
+          { surname: 'DOE', firstname: 'JOHN', title: 'MR' }
         ],
-        segments: [
+        itinerary: [
           {
+            segmentRef: 1,
             airline: 'AA',
             flightNumber: '100',
-            departureAirport: 'LAX',
-            arrivalAirport: 'JFK',
-            departureDate: '15OCT',
-            status: 'HK'
+            bookingClass: 'Y',
+            quantity: 1,
+            origin: 'LAX',
+            destination: 'JFK',
+            departure: '15OCT0900',
+            arrival: '15OCT1700',
+            status: 'KK'
           }
-        ]
+        ],
+        status: 'ACTIVE',
+        createdAt: new Date()
       },
       {
-        pnrLocator: 'X3A1QC',
-        passengers: [
-          { firstName: 'JANE', lastName: 'SMITH', title: 'MS' },
-          { firstName: 'TIMMY', lastName: 'SMITH', title: 'CHD' }
+        recordLocator: 'X3A1QC',
+        sessionId: 'seed-session-2',
+        names: [
+          { surname: 'SMITH', firstname: 'JANE', title: 'MS' },
+          { surname: 'SMITH', firstname: 'TIMMY', title: 'CHD' }
         ],
-        segments: [
+        itinerary: [
           {
+            segmentRef: 1,
             airline: 'DL',
             flightNumber: '205',
-            departureAirport: 'SFO',
-            arrivalAirport: 'LHR',
-            departureDate: '15OCT',
-            status: 'HK'
+            bookingClass: 'Y',
+            quantity: 2,
+            origin: 'SFO',
+            destination: 'LHR',
+            departure: '15OCT1000',
+            arrival: '15OCT1800',
+            status: 'KK'
           },
           {
+            segmentRef: 2,
             airline: 'DL',
             flightNumber: '99',
-            departureAirport: 'LHR',
-            arrivalAirport: 'CDG',
-            departureDate: '16OCT',
-            status: 'HK'
+            bookingClass: 'Y',
+            quantity: 2,
+            origin: 'LHR',
+            destination: 'CDG',
+            departure: '16OCT0900',
+            arrival: '16OCT1100',
+            status: 'KK'
           }
-        ]
+        ],
+        status: 'ACTIVE',
+        createdAt: new Date()
       }
     ];
 

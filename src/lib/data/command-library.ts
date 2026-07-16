@@ -269,5 +269,41 @@ export const commandLibraryData: CommandLibraryEntry[] = [
     description: 'Checks if an airline is a participating carrier.',
     exampleInput: 'GGPCAQR',
     expectedOutput: 'QR IS A PARTICIPATING CARRIER'
+  },
+  {
+    id: 'dd-time',
+    category: 'Reference/Decode',
+    command: 'DD',
+    syntax: 'DD[CITY_CODE]',
+    description: 'Displays the current local date and time in a specific city.',
+    exampleInput: 'DDDEL',
+    expectedOutput: 'DELHI IN THURSDAY 17JUL26 0327'
+  },
+  {
+    id: 'dd-day',
+    category: 'Reference/Decode',
+    command: 'DD',
+    syntax: 'DD[DATE]',
+    description: 'Calculates the day of the week for a given date.',
+    exampleInput: 'DD23JUN',
+    expectedOutput: '23JUN26 TUESDAY'
+  },
+  {
+    id: 'dd-math',
+    category: 'Reference/Decode',
+    command: 'DD',
+    syntax: 'DD[DATE]+[DAYS] / DD[DATE]-[DAYS]',
+    description: 'Adds or subtracts a number of days from a given date.',
+    exampleInput: 'DD15JUL+10',
+    expectedOutput: '15JUL26 + 10D = 25JUL26 SATURDAY'
+  },
+  {
+    id: 'df',
+    category: 'Reference/Decode',
+    command: 'DF',
+    syntax: 'DF[NUM1];[NUM2] / DF[NUM1]-[NUM2] / DF[NUM1]*[NUM2] / DF[NUM1]/[NUM2]',
+    description: 'Performs basic math utilities (addition with semicolon, subtraction, multiplication, division).',
+    exampleInput: 'DF10;5',
+    expectedOutput: '10 + 5 = 15'
   }
 ];

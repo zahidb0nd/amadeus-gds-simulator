@@ -11,6 +11,11 @@ export default defineConfig({
     command: 'npm run dev',
     url: 'http://localhost:3000',
     reuseExistingServer: !process.env.CI,
-    timeout: 120000
+    timeout: 120000,
+    env: {
+      MONGODB_URI: process.env.MONGODB_URI || 'mongodb://localhost:27017/amadeus_test'
+    },
+    stdout: 'pipe',
+    stderr: 'pipe'
   }
 });
