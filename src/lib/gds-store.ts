@@ -44,12 +44,26 @@ export type FlightDocument = {
   destination: string;
   departureTime: string;
   arrivalTime: string;
+  aircraft: string;
   classes: { class: string; seats: number }[];
+};
+
+export type AvailabilitySearchParams = {
+  commandType: 'AN' | 'TN';
+  dateStr: string;
+  date: Date;
+  origin: string;
+  destination: string;
+  airlineFilter?: string;
+  excludeAirline?: string;
+  classFilter?: string;
+  cabinFilter?: string;
 };
 
 export type SessionState = {
   sessionId: string;
   availabilityContext: AvailabilityContextLine[];
+  lastAvailabilitySearch?: AvailabilitySearchParams;
   pnrInProgress: PnrDraft;
   lastCompletedRecordLocator?: string;
   lastCommand: string;
@@ -79,6 +93,7 @@ function createEmptySession(sessionId: string): SessionState {
   return {
     sessionId,
     availabilityContext: [],
+    lastAvailabilitySearch: undefined,
     pnrInProgress: createEmptyDraft(),
     lastCompletedRecordLocator: undefined,
     lastCommand: '',
@@ -115,6 +130,7 @@ function cloneSession(session: SessionState): SessionState {
       tst: session.pnrInProgress.tst
     },
     lastCompletedRecordLocator: session.lastCompletedRecordLocator,
+    lastAvailabilitySearch: session.lastAvailabilitySearch ? { ...session.lastAvailabilitySearch } : undefined,
     updatedAt: new Date(session.updatedAt)
   };
 }
@@ -328,9 +344,27 @@ export async function ensureFlightSeeds(): Promise<void> {
       destination: f.destination,
       departureTime: f.departure,
       arrivalTime: f.arrival,
+      aircraft: f.aircraft,
       classes: Object.entries(f.classes).map(([c, s]) => ({ class: c, seats: s }))
     }));
     await flightsCollection.insertMany(mapped);
+  } else {
+    const sample = await flightsCollection.findOne({ aircraft: { $exists: false } });
+    if (sample) {
+      await flightsCollection.deleteMany({});
+      const mapped = flights.map((f) => ({
+        flightNumber: f.flightNumber,
+        carrierCode: f.airline,
+        origin: f.origin,
+        destination: f.destination,
+        departureTime: f.departure,
+        arrivalTime: f.arrival,
+        aircraft: f.aircraft,
+        classes: Object.entries(f.classes).map(([c, s]) => ({ class: c, seats: s }))
+      }));
+      await flightsCollection.insertMany(mapped);
+      console.log('Migrated flights collection with aircraft data.');
+    }
   }
 }
 
@@ -349,6 +383,7 @@ export async function findFlights(origin: string, destination: string, date: Dat
         destination: f.destination,
         departureTime: f.departure,
         arrivalTime: f.arrival,
+        aircraft: f.aircraft,
         classes: Object.entries(f.classes).map(([c, s]) => ({ class: c, seats: s }))
       }));
   }
@@ -435,6 +470,7 @@ export async function getSessionState(sessionId: string): Promise<SessionState> 
     availabilityContext: existing.availabilityContext ?? [],
     pnrInProgress: existing.pnrInProgress ?? createEmptyDraft(),
     lastCompletedRecordLocator: existing.lastCompletedRecordLocator,
+    lastAvailabilitySearch: existing.lastAvailabilitySearch ? { ...existing.lastAvailabilitySearch, date: new Date(existing.lastAvailabilitySearch.date) } : undefined,
     lastCommand: existing.lastCommand ?? '',
     updatedAt: existing.updatedAt ? new Date(existing.updatedAt) : new Date()
   };
@@ -485,11 +521,15 @@ export async function getLastCompletedRecordLocator(sessionId: string): Promise<
 export async function setAvailabilityContext(
   sessionId: string,
   availabilityContext: AvailabilityContextLine[],
-  lastCommand: string
+  lastCommand: string,
+  searchParams?: AvailabilitySearchParams
 ): Promise<void> {
   const session = await getSessionState(sessionId);
   session.availabilityContext = availabilityContext.map((line) => ({ ...line, classes: { ...line.classes } }));
   session.lastCommand = lastCommand;
+  if (searchParams) {
+    session.lastAvailabilitySearch = searchParams;
+  }
   await saveSessionState(session);
 }
 

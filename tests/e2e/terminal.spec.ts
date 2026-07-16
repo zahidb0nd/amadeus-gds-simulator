@@ -162,5 +162,36 @@ test.describe('Terminal UI', () => {
     await input.press('Enter');
     await expect(page.locator('body')).toContainText('DIVISION BY ZERO');
   });
-});
 
+  test('timetable and availability navigation (Phase C) work in live terminal', async ({ page }) => {
+    await page.goto('/');
+    const input = page.getByTestId('terminal-input');
+
+    // 1. Initial filtered search
+    await input.fill('AN15JULBLRDOH/AQR');
+    await input.press('Enter');
+    await expect(page.locator('body')).toContainText('AMADEUS AVAILABILITY');
+    // Ensure QR is there
+    await expect(page.locator('body')).toContainText('QR');
+    // Ensure 6E is NOT there (assuming it's normally there)
+    await expect(page.locator('body')).not.toContainText('6E');
+
+    // 2. Move Next day (MN)
+    await input.fill('MN');
+    await input.press('Enter');
+    await expect(page.locator('body')).toContainText('16JUL');
+    // Filter should carry over
+    await expect(page.locator('body')).toContainText('QR');
+
+    // 3. Sell segment from the filtered list (SS1Y1)
+    await input.fill('SS1Y1');
+    await input.press('Enter');
+    await expect(page.locator('body')).toContainText('Y1  BLR DOH');
+
+    // 4. Test timetable (TN)
+    await input.fill('TN20AUGBLRDOH');
+    await input.press('Enter');
+    await expect(page.locator('body')).toContainText('AMADEUS TIMETABLE - TN');
+    await expect(page.locator('body')).toContainText('J  C  Y'); // Class letters without numbers
+  });
+});

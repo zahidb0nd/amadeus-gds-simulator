@@ -35,14 +35,25 @@ export function tokenizeCommand(input: string): ParsedCommand | null {
   } else if (normalizedInput.startsWith('DNA')) {
     commandToken = 'DNA';
     argument = normalizedInput.slice(3).trim();
-  } else if (normalizedInput.startsWith('DC')) {
-    commandToken = 'DC';
-    argument = normalizedInput.slice(2).trim();
-  } else if (normalizedInput.startsWith('DD')) {
-    commandToken = 'DD';
-    argument = normalizedInput.slice(2).trim();
-  } else if (normalizedInput.startsWith('DF')) {
-    commandToken = 'DF';
+  } else if (normalizedInput.startsWith('DMI')) {
+    commandToken = 'DMI';
+    argument = normalizedInput.slice(3).trim();
+  } else if (normalizedInput.startsWith('DRT')) {
+    commandToken = 'DRT';
+    argument = normalizedInput.slice(3).trim();
+  } else if (
+    normalizedInput.startsWith('TN') ||
+    normalizedInput.startsWith('DC') ||
+    normalizedInput.startsWith('DD') ||
+    normalizedInput.startsWith('DF') ||
+    normalizedInput.startsWith('MN') ||
+    normalizedInput.startsWith('MY') ||
+    normalizedInput.startsWith('MB') ||
+    normalizedInput.startsWith('AC') ||
+    normalizedInput.startsWith('DO') ||
+    normalizedInput.startsWith('DM')
+  ) {
+    commandToken = normalizedInput.slice(0, 2);
     argument = normalizedInput.slice(2).trim();
   } else {
     commandToken = normalizedInput.split(/\s+/)[0];

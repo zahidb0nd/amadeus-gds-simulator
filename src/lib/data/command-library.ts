@@ -305,5 +305,68 @@ export const commandLibraryData: CommandLibraryEntry[] = [
     description: 'Performs basic math utilities (addition with semicolon, subtraction, multiplication, division).',
     exampleInput: 'DF10;5',
     expectedOutput: '10 + 5 = 15'
+  },
+  {
+    id: 'tn',
+    category: 'Availability',
+    command: 'TN',
+    syntax: 'TN[DDMMM][ORIGIN][DEST]',
+    description: 'Displays a one-week timetable for all carriers on a route.',
+    exampleInput: 'TN15JULBLRDOH',
+    expectedOutput: '** AMADEUS TIMETABLE - TN **  15JUL26  BLR BENGALURU DOH DOHA\n...'
+  },
+  {
+    id: 'mn',
+    category: 'Availability',
+    command: 'MN',
+    syntax: 'MN / MY / MB',
+    description: 'Moves the last availability display to the next day (MN), yesterday (MY), or bottom (MB).',
+    exampleInput: 'MN',
+    expectedOutput: '** AMADEUS AVAILABILITY - AN **  16JUL26  BLR BENGALURU DOH DOHA\n...'
+  },
+  {
+    id: 'ac',
+    category: 'Availability',
+    command: 'AC',
+    syntax: 'AC[DATE] / AC[+/-NUM] / AC[CITY]',
+    description: 'Changes the date or origin city of the last availability display.',
+    exampleInput: 'AC10JUL',
+    expectedOutput: '** AMADEUS AVAILABILITY - AN **  10JUL26  BLR BENGALURU DOH DOHA\n...'
+  },
+  {
+    id: 'do',
+    category: 'Reference/Decode',
+    command: 'DO',
+    syntax: 'DO[AIRLINE][FLIGHT]',
+    description: 'Looks up the operating vs marketing carrier for a flight.',
+    exampleInput: 'DOQR522',
+    expectedOutput: 'QR 522 - OPERATED BY QATAR AIRWAYS'
+  },
+  {
+    id: 'dm',
+    category: 'Reference/Decode',
+    command: 'DM',
+    syntax: 'DM[AIRPORT_CODE]',
+    description: 'Displays the Minimum Connecting Time (MCT) policy for an airport.',
+    exampleInput: 'DMDOH',
+    expectedOutput: 'STANDARD MCT FOR DOH (DOHA) IS 0100 (1HR 00MIN)\nEXCEPTIONS MAY APPLY'
+  },
+  {
+    id: 'dmi',
+    category: 'Reference/Decode',
+    command: 'DMI',
+    syntax: 'DMI',
+    description: 'Checks the current itinerary against Minimum Connecting Time (MCT) rules.',
+    exampleInput: 'DMI',
+    expectedOutput: 'ALL CONNECTIONS MEET MINIMUM CONNECTING TIME'
+  },
+  {
+    id: 'drt',
+    category: 'Reference/Decode',
+    command: 'DRT',
+    syntax: 'DRT[ORIGIN][DEST]',
+    description: 'Displays routing and connection options between two cities.',
+    exampleInput: 'DRTBLRDOH',
+    expectedOutput: 'ROUTING OPTIONS FOR BLR TO DOH:\n1. DIRECT FLIGHTS\n2. VIA MAJOR ALLIANCE HUBS'
   }
 ];

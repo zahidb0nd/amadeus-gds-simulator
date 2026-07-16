@@ -14,6 +14,20 @@ describe('command parser and engine', () => {
     expect(lines[3].indexOf('BLR DOH')).toBe(lines[1].indexOf('BLR DOH'));
   });
 
+  it('includes specific aircraft types in availability output, not generic fallbacks', async () => {
+    const result = await executeCommand('AN15JULBLRDOH');
+    const lines = result.output.split('\n');
+
+    expect(result.ok).toBe(true);
+    // QR522 operates a 321
+    expect(lines[1]).toContain('QR  522');
+    expect(lines[1]).toContain('E0/321');
+    
+    // QR528 operates a 359
+    expect(lines[4]).toContain('QR  528');
+    expect(lines[4]).toContain('E0/359');
+  });
+
   it('rejects missing AN arguments as invalid format', async () => {
     const result = await executeCommand('AN15JULBLR');
 

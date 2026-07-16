@@ -20,11 +20,15 @@ import { dcCommand } from './dc';
 import { ggCommand } from './gg';
 import { ddCommand } from './dd';
 import { dfCommand } from './df';
+import { availabilityNavCommand } from './availability-nav';
+import { flightInfoCommand } from './flight-info';
 import type { CommandHandler } from './types';
 
 export const commandHandlers: CommandHandler[] = [
   helpCommand,
   availabilityCommand,
+  availabilityNavCommand,
+  flightInfoCommand,
   dacCommand,
   danCommand,
   eanCommand,
