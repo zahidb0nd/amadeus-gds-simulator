@@ -17,8 +17,8 @@ export function tokenizeCommand(input: string): ParsedCommand | null {
   let argument = '';
 
   // Special component-agnostic routing for specific verbs
-  if (normalizedInput.startsWith('AN')) {
-    commandToken = 'AN';
+  if (normalizedInput.startsWith('AN') || normalizedInput.startsWith('AD')) {
+    commandToken = normalizedInput.slice(0, 2);
     argument = normalizedInput.slice(2).trim();
   } else if (normalizedInput.startsWith('NM1')) {
     commandToken = 'NM1';
