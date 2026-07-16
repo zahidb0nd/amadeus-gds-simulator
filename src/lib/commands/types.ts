@@ -8,6 +8,8 @@ export type CommandResult = {
 export type CommandHandlerContext = {
   rawInput: string;
   normalizedInput: string;
+  commandToken: string;
+  argument: string;
   sessionId: string;
 };
 

@@ -12,32 +12,32 @@ describe('Reference Decode/Encode Commands', () => {
   });
 
   describe('DAC (Airline Decode)', () => {
-    it('should decode a valid airline code', () => {
+    it('should decode a valid airline code', async () => {
       expect(dacCommand.match('DACQR')).toBe(true);
-      const result = dacCommand.execute(createCtx('DACQR'));
+      const result = await dacCommand.execute(createCtx('DACQR'));
       expect(result.ok).toBe(true);
       expect(result.output).toBe('QR - QATAR AIRWAYS (ONEWORLD)');
     });
 
-    it('should return NOT FOUND for an invalid airline code', () => {
+    it('should return NOT FOUND for an invalid airline code', async () => {
       expect(dacCommand.match('DACXX')).toBe(true);
-      const result = dacCommand.execute(createCtx('DACXX'));
+      const result = await dacCommand.execute(createCtx('DACXX'));
       expect(result.ok).toBe(false);
       expect(result.output).toBe('NOT FOUND');
     });
   });
 
   describe('DAN (Airport Decode)', () => {
-    it('should decode a valid airport code', () => {
+    it('should decode a valid airport code', async () => {
       expect(danCommand.match('DANBLR')).toBe(true);
-      const result = danCommand.execute(createCtx('DANBLR'));
+      const result = await danCommand.execute(createCtx('DANBLR'));
       expect(result.ok).toBe(true);
       expect(result.output).toBe('BLR - KEMPEGOWDA INTERNATIONAL, BENGALURU, IN');
     });
 
-    it('should return NOT FOUND for an invalid airport code', () => {
+    it('should return NOT FOUND for an invalid airport code', async () => {
       expect(danCommand.match('DANXXX')).toBe(true);
-      const result = danCommand.execute(createCtx('DANXXX'));
+      const result = await danCommand.execute(createCtx('DANXXX'));
       expect(result.ok).toBe(false);
       expect(result.output).toBe('NOT FOUND');
     });
@@ -86,12 +86,12 @@ describe('Reference Decode/Encode Commands', () => {
   });
 
   describe('New Database Lookups', () => {
-    it('should decode newly imported airport codes', () => {
-      const resultJfk = danCommand.execute(createCtx('DANJFK'));
+    it('should decode newly imported airport codes', async () => {
+      const resultJfk = await danCommand.execute(createCtx('DANJFK'));
       expect(resultJfk.ok).toBe(true);
       expect(resultJfk.output).toBe('JFK - JOHN F KENNEDY INTERNATIONAL, NEW YORK, US');
 
-      const resultKef = danCommand.execute(createCtx('DANKEF'));
+      const resultKef = await danCommand.execute(createCtx('DANKEF'));
       expect(resultKef.ok).toBe(true);
       expect(resultKef.output).toBe('KEF - KEFLAVIK NAS, KEFLAVIK, IS');
     });

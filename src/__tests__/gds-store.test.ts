@@ -33,7 +33,8 @@ describe('In-Memory Storage State: gds-store.ts', () => {
     // Assert: Verify a valid PnrDocument structure was generated
     expect(pnrDocument).toBeDefined();
     expect(pnrDocument?.names[0].surname).toBe('SMITH');
-    expect(pnrDocument?.names[0].firstname).toBe('JOHNMR');
+    expect(pnrDocument?.names[0].firstname).toBe('JOHN');
+    expect(pnrDocument?.names[0].title).toBe('MR');
 
     // Assert: Use regex to assert that the generated PNR locator is exactly 6 alphanumeric uppercase characters
     expect(pnrDocument?.recordLocator).toMatch(/^[A-Z0-9]{6}$/);

@@ -1,12 +1,22 @@
 import type { CommandHandler } from './types';
-import { getAirport } from '../data/airports';
+import { findAirportByName } from '../gds-store';
 
 export const danCommand: CommandHandler = {
   name: 'DAN',
-  match: (input) => /^DAN[A-Z]{3}$/.test(input),
-  execute: ({ normalizedInput }) => {
-    const code = normalizedInput.slice(3);
-    const airport = getAirport(code);
+  match: (input) => /^DAN.*$/.test(input),
+  execute: async ({ normalizedInput, argument }) => {
+    const arg = argument || normalizedInput.slice(3).trim();
+
+    if (arg.length === 0) {
+      return {
+        ok: false,
+        command: 'DAN',
+        echo: normalizedInput,
+        output: 'INVALID FORMAT'
+      };
+    }
+
+    const airport = await findAirportByName(arg);
 
     if (!airport) {
       return {

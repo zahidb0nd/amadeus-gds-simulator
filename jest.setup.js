@@ -30,14 +30,15 @@ if (!process.env.MONGODB_URI) {
 			}
 		}
 
-		afterAll(async () => {
-			try {
-				const { getMongoClient } = require('./src/lib/mongodb');
-				const client = await getMongoClient();
-				await client.close();
-			} catch {
-				// No shared client was opened during the test run.
-			}
-		});
+		// Let Jest forceExit handle closing connections cleanly without throwing MongoExpiredSessionError
+		// afterAll(async () => {
+		// 	try {
+		// 		const { getMongoClient } = require('./src/lib/mongodb');
+		// 		const client = await getMongoClient();
+		// 		await client.close();
+		// 	} catch {
+		// 		// No shared client was opened during the test run.
+		// 	}
+		// });
 	}
 }

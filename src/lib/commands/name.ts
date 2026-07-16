@@ -1,15 +1,14 @@
-import { updatePnrDraft } from '@/lib/gds-store';
+import { updatePnrDraft } from '../gds-store';
 import type { CommandHandler } from './types';
-
-const namePattern = /^NM1([A-Z]+)\/([A-Z]+)$/;
 
 export const nameCommand: CommandHandler = {
   name: 'NM',
   match(input) {
-    return namePattern.test(input);
+    return /^NM1.*$/.test(input);
   },
   async execute(context) {
-    const match = context.normalizedInput.match(namePattern);
+    // AST Payload extraction from normalizedInput
+    const match = context.normalizedInput.match(/^NM1([A-Z0-9]+)\/([A-Z0-9\s]+)$/);
 
     if (!match) {
       return {
@@ -20,18 +19,57 @@ export const nameCommand: CommandHandler = {
       };
     }
 
-    const [, surname, firstname] = match;
+    const surname = match[1];
+    const firstAndTitleRaw = match[2];
+    
+    let firstname = firstAndTitleRaw;
+    let title = '';
 
-    await updatePnrDraft(context.sessionId, (draft) => ({
-      ...draft,
-      names: [...draft.names, { surname, firstname }]
-    }));
+    if (firstAndTitleRaw.includes(' ')) {
+      const parts = firstAndTitleRaw.split(' ');
+      firstname = parts[0];
+      title = parts.slice(1).join(' ');
+    } else {
+      // Handle cases like JANEMS
+      const commonTitles = ['MRS', 'MISS', 'MSTR', 'REV', 'MR', 'MS', 'DR'];
+      for (const t of commonTitles) {
+        if (firstAndTitleRaw.endsWith(t)) {
+          title = t;
+          firstname = firstAndTitleRaw.slice(0, -t.length);
+          break;
+        }
+      }
+    }
+
+    const parsedPayload = {
+      commandType: 'NM1',
+      lastName: surname,
+      firstName: firstname,
+      title: title
+    };
+
+    let newPassengerCount = 0;
+
+    await updatePnrDraft(context.sessionId, (draft) => {
+      newPassengerCount = draft.names.length + 1;
+      const passenger: any = { surname: parsedPayload.lastName, firstname: parsedPayload.firstName };
+      if (parsedPayload.title) {
+        passenger.title = parsedPayload.title;
+      }
+      return {
+        ...draft,
+        names: [...draft.names, passenger]
+      };
+    });
+
+    const titleStr = parsedPayload.title ? ` ${parsedPayload.title}` : '';
+    const formattedName = `${parsedPayload.lastName}/${parsedPayload.firstName}${titleStr}`;
 
     return {
       ok: true,
       command: 'NM',
       echo: context.normalizedInput,
-      output: `1  ${surname}/${firstname}`
+      output: `1.${newPassengerCount}${formattedName}`
     };
   }
 };

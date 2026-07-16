@@ -103,7 +103,7 @@ describe('fare pricing and workarea commands', () => {
     await executeCommand('FXP', { sessionId });
 
     const erResult = await executeCommand('ER', { sessionId });
-    const recordLocator = erResult.output.match(/PNR CREATED ([A-Z0-9]{6})/)?.[1] ?? '';
+    const recordLocator = erResult.output.split('\n')[0].match(/([A-Z0-9]{6})\s*$/)?.[1] ?? '';
 
     expect(recordLocator).toHaveLength(6);
 
@@ -125,7 +125,7 @@ describe('fare pricing and workarea commands', () => {
     await executeCommand('FXP', { sessionId });
 
     const erResult = await executeCommand('ER', { sessionId });
-    const recordLocator = erResult.output.match(/PNR CREATED ([A-Z0-9]{6})/)?.[1] ?? '';
+    const recordLocator = erResult.output.split('\n')[0].match(/([A-Z0-9]{6})\s*$/)?.[1] ?? '';
 
     const xiResult = await executeCommand('XI1', { sessionId });
     const pnr = await getPnr(recordLocator);
@@ -161,7 +161,7 @@ describe('fare pricing and workarea commands', () => {
     await executeCommand('FXP', { sessionId });
 
     const erResult = await executeCommand('ER', { sessionId });
-    const recordLocator = erResult.output.match(/PNR CREATED ([A-Z0-9]{6})/)?.[1] ?? '';
+    const recordLocator = erResult.output.split('\n')[0].match(/([A-Z0-9]{6})\s*$/)?.[1] ?? '';
 
     await executeCommand('TTP', { sessionId });
     await executeCommand('XI1', { sessionId });
@@ -185,7 +185,7 @@ describe('fare pricing and workarea commands', () => {
     await executeCommand('FXP', { sessionId });
 
     const erResult = await executeCommand('ER', { sessionId });
-    const recordLocator = erResult.output.match(/PNR CREATED ([A-Z0-9]{6})/)?.[1] ?? '';
+    const recordLocator = erResult.output.split('\n')[0].match(/([A-Z0-9]{6})\s*$/)?.[1] ?? '';
 
     await executeCommand('TTP', { sessionId });
     await executeCommand('XI1', { sessionId });
@@ -224,7 +224,7 @@ describe('fare pricing and workarea commands', () => {
     await executeCommand('FXP', { sessionId });
 
     const erResult = await executeCommand('ER', { sessionId });
-    const recordLocator = erResult.output.match(/PNR CREATED ([A-Z0-9]{6})/)?.[1] ?? '';
+    const recordLocator = erResult.output.split('\n')[0].match(/([A-Z0-9]{6})\s*$/)?.[1] ?? '';
 
     await executeCommand('TTP', { sessionId });
 
@@ -248,7 +248,7 @@ describe('fare pricing and workarea commands', () => {
     await executeCommand('FXP', { sessionId });
 
     const erResult = await executeCommand('ER', { sessionId });
-    const recordLocator = erResult.output.match(/PNR CREATED ([A-Z0-9]{6})/)?.[1] ?? '';
+    const recordLocator = erResult.output.split('\n')[0].match(/([A-Z0-9]{6})\s*$/)?.[1] ?? '';
 
     await executeCommand('TTP', { sessionId });
 

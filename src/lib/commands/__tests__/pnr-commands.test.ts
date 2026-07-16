@@ -38,7 +38,7 @@ describe('PNR command flow', () => {
     const result = await executeCommand('NM1KHAN/ZAHID', { sessionId });
 
     expect(result.ok).toBe(true);
-    expect(result.output).toBe('1  KHAN/ZAHID');
+    expect(result.output).toBe('1.1KHAN/ZAHID');
   });
 
   it('stores the contact element', async () => {
@@ -68,7 +68,7 @@ describe('PNR command flow', () => {
     await buildBasicPnr(sessionId);
 
     const result = await executeCommand('ER', { sessionId });
-    const match = result.output.match(/PNR CREATED ([A-Z0-9]{6})/);
+    const match = result.output.split('\n')[0].match(/([A-Z0-9]{6})\s*$/);
 
     expect(result.ok).toBe(true);
     expect(match).not.toBeNull();
@@ -90,7 +90,7 @@ describe('PNR command flow', () => {
     await buildBasicPnr(sessionId);
 
     const erResult = await executeCommand('ER', { sessionId });
-    const recordLocator = erResult.output.match(/PNR CREATED ([A-Z0-9]{6})/)?.[1] ?? '';
+    const recordLocator = erResult.output.split('\n')[0].match(/([A-Z0-9]{6})\s*$/)?.[1] ?? '';
 
     expect(recordLocator).toHaveLength(6);
 

@@ -33,6 +33,8 @@ export async function executeCommand(input: string, options: ExecuteCommandOptio
   return handler.execute({
     rawInput: parsed.rawInput,
     normalizedInput: parsed.normalizedInput,
+    commandToken: parsed.commandToken,
+    argument: parsed.argument,
     sessionId
   });
 }

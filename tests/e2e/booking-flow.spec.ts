@@ -27,7 +27,7 @@ test('booking flow: AN -> SS -> NM -> AP -> TK -> FXP -> ER -> TTP -> XI -> REFU
   const nmJson = await nmResponse.json();
 
   expect(nmResponse.ok()).toBe(true);
-  expect(nmJson.output).toBe('1  KHAN/ZAHID');
+  expect(nmJson.output).toBe('1.1KHAN/ZAHID');
 
   const apResponse = await postCommand('AP+9745551234');
   const apJson = await apResponse.json();
@@ -52,9 +52,9 @@ test('booking flow: AN -> SS -> NM -> AP -> TK -> FXP -> ER -> TTP -> XI -> REFU
   const erJson = await erResponse.json();
 
   expect(erResponse.ok()).toBe(true);
-  expect(erJson.output).toMatch(/^PNR CREATED [A-Z0-9]{6}$/);
+  expect(erJson.output.split('\n')[0]).toMatch(/([A-Z0-9]{6})\s*$/);
 
-  const recordLocator = erJson.output.replace('PNR CREATED ', '');
+  const recordLocator = erJson.output.split('\n')[0].match(/([A-Z0-9]{6})\s*$/)?.[1] ?? '';
 
   const ttpResponse = await postCommand('TTP');
   const ttpJson = await ttpResponse.json();

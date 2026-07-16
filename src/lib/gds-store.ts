@@ -1,5 +1,7 @@
 import { randomBytes } from 'crypto';
 import { getMongoClient } from './mongodb';
+import { airports, type Airport } from './data/airports';
+import { flights } from './data/flights';
 
 export type AvailabilityContextLine = {
   lineNumber: number;
@@ -17,6 +19,7 @@ export type AvailabilityContextLine = {
 export type PnrName = {
   surname: string;
   firstname: string;
+  title?: string;
 };
 
 export type PnrSegment = {
@@ -74,6 +77,16 @@ export type PnrDraft = {
   contact?: string;
   ticketingArrangement?: string;
   tst?: TstQuote;
+};
+
+export type FlightDocument = {
+  flightNumber: string;
+  carrierCode: string;
+  origin: string;
+  destination: string;
+  departureTime: string;
+  arrivalTime: string;
+  classes: { class: string; seats: number }[];
 };
 
 export type SessionState = {
@@ -143,7 +156,9 @@ async function getCollections() {
   return {
     sessions: db.collection<SessionState>('sessions'),
     pnrs: db.collection<PnrDocument>('pnrs'),
-    fares: db.collection<FareDocument>('fares')
+    fares: db.collection<FareDocument>('fares'),
+    airports: db.collection<Airport>('airports'),
+    flights: db.collection<FlightDocument>('flights')
   };
 }
 
@@ -204,6 +219,108 @@ export async function ensureFareSeeds(): Promise<void> {
   }
 }
 
+export async function ensureAirportSeeds(): Promise<void> {
+  if (!useMongoBackend()) {
+    return;
+  }
+
+  const { airports: airportsCollection } = await getCollections();
+  const count = await airportsCollection.countDocuments({});
+
+  if (count === 0) {
+    // Insert in batches if needed, but native driver handles large arrays reasonably well
+    await airportsCollection.insertMany(airports as any[]);
+  }
+}
+
+export async function findAirportByCode(code: string): Promise<Airport | null> {
+  const normalizedCode = code.toUpperCase();
+
+  if (!useMongoBackend()) {
+    return airports.find(a => a.code === normalizedCode) ?? null;
+  }
+
+  await ensureAirportSeeds();
+  const { airports: airportsCollection } = await getCollections();
+  return airportsCollection.findOne({ code: normalizedCode });
+}
+
+export async function findAirportByName(name: string): Promise<Airport | null> {
+  const normalizedName = name.toUpperCase();
+  const searchRegex = new RegExp(name, 'i');
+
+  if (!useMongoBackend()) {
+    const exactMatch = airports.find(a => a.code === normalizedName);
+    if (exactMatch) return exactMatch;
+
+    return airports.find(a => 
+      a.city.toUpperCase().includes(normalizedName) || 
+      a.name.toUpperCase().includes(normalizedName)
+    ) ?? null;
+  }
+
+  await ensureAirportSeeds();
+  const { airports: airportsCollection } = await getCollections();
+  
+  const exactMatch = await airportsCollection.findOne({ code: normalizedName });
+  if (exactMatch) return exactMatch;
+
+  return airportsCollection.findOne({
+    $or: [
+      { city: { $regex: searchRegex } },
+      { name: { $regex: searchRegex } }
+    ]
+  });
+}
+
+export async function ensureFlightSeeds(): Promise<void> {
+  if (!useMongoBackend()) {
+    return;
+  }
+
+  const { flights: flightsCollection } = await getCollections();
+  const count = await flightsCollection.countDocuments({});
+
+  if (count === 0) {
+    const mapped = flights.map((f) => ({
+      flightNumber: f.flightNumber,
+      carrierCode: f.airline,
+      origin: f.origin,
+      destination: f.destination,
+      departureTime: f.departure,
+      arrivalTime: f.arrival,
+      classes: Object.entries(f.classes).map(([c, s]) => ({ class: c, seats: s }))
+    }));
+    await flightsCollection.insertMany(mapped);
+  }
+}
+
+export async function findFlights(origin: string, destination: string, date: Date): Promise<FlightDocument[]> {
+  const normalizedOrigin = origin.toUpperCase();
+  const normalizedDestination = destination.toUpperCase();
+
+  if (!useMongoBackend()) {
+    // Map existing local RAM flights array to new FlightDocument interface
+    return flights
+      .filter((f) => f.origin === normalizedOrigin && f.destination === normalizedDestination)
+      .map((f) => ({
+        flightNumber: f.flightNumber,
+        carrierCode: f.airline,
+        origin: f.origin,
+        destination: f.destination,
+        departureTime: f.departure,
+        arrivalTime: f.arrival,
+        classes: Object.entries(f.classes).map(([c, s]) => ({ class: c, seats: s }))
+      }));
+  }
+
+  await ensureFlightSeeds();
+  const { flights: flightsCollection } = await getCollections();
+  // Using a real DB, you'd likely query by date range as well. 
+  // For the simulator, we'll just match origin and destination.
+  return flightsCollection.find({ origin: normalizedOrigin, destination: normalizedDestination }).toArray();
+}
+
 export async function findFare(origin: string, destination: string, bookingClass: string): Promise<FareDocument | null> {
   const normalizedOrigin = origin.toUpperCase();
   const normalizedDestination = destination.toUpperCase();
@@ -221,6 +338,10 @@ export async function findFare(origin: string, destination: string, bookingClass
   }
 
   if (!fare) {
+    const VALID_CLASSES = ['F', 'J', 'C', 'D', 'W', 'Y', 'B', 'M'];
+    if (!VALID_CLASSES.includes(normalizedClass)) {
+      return null;
+    }
     fare = {
       origin: normalizedOrigin,
       destination: normalizedDestination,

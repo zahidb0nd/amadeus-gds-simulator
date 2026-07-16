@@ -4,6 +4,12 @@ module.exports = defineConfig({
   testDir: './tests/e2e',
   timeout: 30000,
   use: {
-    baseURL: 'https://amadeus-gds-simulator.vercel.app'
+    baseURL: 'http://localhost:3000'
+  },
+  webServer: {
+    command: 'npm run dev',
+    url: 'http://localhost:3000',
+    reuseExistingServer: !process.env.CI,
+    timeout: 120000
   }
 });

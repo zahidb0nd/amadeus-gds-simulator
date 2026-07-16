@@ -114,6 +114,6 @@ test.describe('Terminal UI', () => {
     await input.fill('GPOW');
     await input.press('Enter');
     await expect(page.locator('text=ONEWORLD ALLIANCE CARRIERS:')).toBeVisible();
-    await expect(page.locator('text=QR - QATAR AIRWAYS')).toBeVisible();
+    await expect(page.locator('text=QR - QATAR AIRWAYS').first()).toBeVisible();
   });
 });

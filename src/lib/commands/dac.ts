@@ -1,14 +1,45 @@
 import type { CommandHandler } from './types';
+import { findAirportByCode } from '../gds-store';
 import { getAirline } from '../data/airlines';
 
 export const dacCommand: CommandHandler = {
   name: 'DAC',
-  match: (input) => /^DAC[A-Z0-9]{2}$/.test(input),
-  execute: ({ normalizedInput }) => {
-    const code = normalizedInput.slice(3);
-    const airline = getAirline(code);
+  match: (input) => /^DAC.*$/.test(input),
+  execute: async ({ normalizedInput, argument }) => {
+    const arg = argument || normalizedInput.slice(3).trim();
 
-    if (!airline) {
+    if (arg.length === 2) {
+      const airline = getAirline(arg);
+
+      if (!airline) {
+        return {
+          ok: false,
+          command: 'DAC',
+          echo: normalizedInput,
+          output: 'NOT FOUND'
+        };
+      }
+
+      return {
+        ok: true,
+        command: 'DAC',
+        echo: normalizedInput,
+        output: `${airline.code} - ${airline.name.toUpperCase()} (${airline.alliance.toUpperCase()})`
+      };
+    }
+
+    if (arg.length !== 3) {
+      return {
+        ok: false,
+        command: 'DAC',
+        echo: normalizedInput,
+        output: 'INVALID FORMAT'
+      };
+    }
+
+    const airport = await findAirportByCode(arg);
+
+    if (!airport) {
       return {
         ok: false,
         command: 'DAC',
@@ -21,7 +52,7 @@ export const dacCommand: CommandHandler = {
       ok: true,
       command: 'DAC',
       echo: normalizedInput,
-      output: `${airline.code} - ${airline.name.toUpperCase()} (${airline.alliance.toUpperCase()})`
+      output: `${airport.code} - ${airport.name.toUpperCase()}, ${airport.city.toUpperCase()}, ${airport.country.toUpperCase()}`
     };
   }
 };
