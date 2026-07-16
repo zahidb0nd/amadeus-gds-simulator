@@ -34,7 +34,7 @@ export async function executeCommand(input: string, options: ExecuteCommandOptio
     rawInput: parsed.rawInput,
     normalizedInput: parsed.normalizedInput,
     commandToken: parsed.commandToken,
-    argument: parsed.argument,
+    argument: parsed.argument ?? '',
     sessionId
   });
 }

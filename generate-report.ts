@@ -80,8 +80,8 @@ async function run() {
       
       if (i % 10 === 0) console.log(`Processed ${i}/${indiaAirports.length}...`);
 
-    } catch (e) {
-      console.error(`Error on ${origin.code}-${dest.code}:`, e.message);
+    } catch (e: any) {
+      console.error(`Error on ${origin.code}-${dest.code}:`, e?.message || e);
       report += `| ${origin.code} | ${dest.code} | ERROR | ERROR | ERROR | ❌ CRASH |\n`;
       failCount++;
     }
