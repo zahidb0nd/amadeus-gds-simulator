@@ -245,9 +245,13 @@ export async function findAirportByCode(code: string): Promise<Airport | null> {
   return airportsCollection.findOne({ code: normalizedCode });
 }
 
+function escapeRegExp(string: string) {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 export async function findAirportByName(name: string): Promise<Airport | null> {
   const normalizedName = name.toUpperCase();
-  const searchRegex = new RegExp(name, 'i');
+  const searchRegex = new RegExp(escapeRegExp(name), 'i');
 
   if (!useMongoBackend()) {
     const exactMatch = airports.find(a => a.code === normalizedName);
@@ -271,6 +275,34 @@ export async function findAirportByName(name: string): Promise<Airport | null> {
       { name: { $regex: searchRegex } }
     ]
   });
+}
+
+export async function findAirportsByName(name: string): Promise<Airport[]> {
+  const normalizedName = name.toUpperCase();
+  const searchRegex = new RegExp(escapeRegExp(name), 'i');
+
+  if (!useMongoBackend()) {
+    const exactMatches = airports.filter(a => a.code === normalizedName);
+    if (exactMatches.length > 0) return exactMatches;
+
+    return airports.filter(a =>
+      a.city.toUpperCase().includes(normalizedName) ||
+      a.name.toUpperCase().includes(normalizedName)
+    );
+  }
+
+  await ensureAirportSeeds();
+  const { airports: airportsCollection } = await getCollections();
+
+  const exactMatches = await airportsCollection.find({ code: normalizedName }).toArray();
+  if (exactMatches.length > 0) return exactMatches;
+
+  return airportsCollection.find({
+    $or: [
+      { city: { $regex: searchRegex } },
+      { name: { $regex: searchRegex } }
+    ]
+  }).toArray();
 }
 
 export async function ensureFlightSeeds(): Promise<void> {

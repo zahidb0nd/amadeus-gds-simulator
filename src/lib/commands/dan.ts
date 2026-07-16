@@ -1,5 +1,5 @@
 import type { CommandHandler } from './types';
-import { findAirportByName } from '../gds-store';
+import { findAirportsByName } from '../gds-store';
 
 export const danCommand: CommandHandler = {
   name: 'DAN',
@@ -16,9 +16,9 @@ export const danCommand: CommandHandler = {
       };
     }
 
-    const airport = await findAirportByName(arg);
+    const airports = await findAirportsByName(arg);
 
-    if (!airport) {
+    if (!airports || airports.length === 0) {
       return {
         ok: false,
         command: 'DAN',
@@ -27,11 +27,13 @@ export const danCommand: CommandHandler = {
       };
     }
 
+    const output = airports.map((airport) => `${airport.code} - ${airport.name.toUpperCase()}, ${airport.city.toUpperCase()}, ${airport.country.toUpperCase()}`).join('\n');
+
     return {
       ok: true,
       command: 'DAN',
       echo: normalizedInput,
-      output: `${airport.code} - ${airport.name.toUpperCase()}, ${airport.city.toUpperCase()}, ${airport.country.toUpperCase()}`
+      output
     };
   }
 };

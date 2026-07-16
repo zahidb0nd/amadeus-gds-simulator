@@ -13,9 +13,11 @@ function parseDate(dateStr: string): Date {
   const now = new Date();
   let year = now.getFullYear();
   
-  // If the parsed month is earlier than the current month, assume next year
-  if (monthIndex < now.getMonth() && monthIndex !== -1) {
-    year++;
+  // If the parsed month and day are earlier than the current date, assume next year
+  if (monthIndex !== -1) {
+    if (monthIndex < now.getMonth() || (monthIndex === now.getMonth() && day < now.getDate())) {
+      year++;
+    }
   }
   
   return new Date(year, monthIndex !== -1 ? monthIndex : 0, day);
@@ -83,13 +85,15 @@ function buildAvailabilityContext(date: string, origin: string, destination: str
 export const availabilityCommand: CommandHandler = {
   name: 'AN',
   match(input) {
-    return /^AN.*$/.test(input);
+    return /^(AN|AD).*$/.test(input);
   },
   async execute(context) {
+    const cmdToken = context.commandToken || (context.normalizedInput.startsWith('AD') ? 'AD' : 'AN');
+
     if (!context.argument) {
       return {
         ok: false,
-        command: 'AN',
+        command: cmdToken,
         echo: context.normalizedInput,
         output: 'INVALID FORMAT'
       };
@@ -100,7 +104,7 @@ export const availabilityCommand: CommandHandler = {
     if (!match) {
       return {
         ok: false,
-        command: 'AN',
+        command: cmdToken,
         echo: context.normalizedInput,
         output: 'INVALID FORMAT'
       };
@@ -114,7 +118,7 @@ export const availabilityCommand: CommandHandler = {
     
     // AST Payload as requested
     const parsedPayload = {
-      commandType: 'AN',
+      commandType: cmdToken,
       date: dateObj,
       origin,
       destination
@@ -126,7 +130,7 @@ export const availabilityCommand: CommandHandler = {
 
     return {
       ok: true,
-      command: 'AN',
+      command: cmdToken,
       echo: context.normalizedInput,
       output: await formatAvailability(dateStr, parsedPayload.origin, parsedPayload.destination, flights)
     };
