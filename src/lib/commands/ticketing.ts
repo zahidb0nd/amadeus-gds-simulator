@@ -1,17 +1,30 @@
 import { updatePnrDraft } from '@/lib/gds-store';
 import type { CommandHandler } from './types';
 
-const ticketingPattern = /^TK\s+(TL.+)$/;
-
 export const ticketingCommand: CommandHandler = {
   name: 'TK',
   match(input) {
-    return ticketingPattern.test(input);
+    const norm = input.toUpperCase().replace(/\s+/g, '');
+    return norm.startsWith('TKTL') || norm.startsWith('TKDO') || norm.startsWith('TKIN') || norm === 'TKOK';
   },
   async execute(context) {
-    const match = context.normalizedInput.match(ticketingPattern);
+    const input = context.normalizedInput.replace(/\s+/g, '');
+    let type = '';
+    let arrangementText = '';
 
-    if (!match) {
+    if (input === 'TKOK') {
+      type = 'OK';
+      arrangementText = 'OK';
+    } else if (input.startsWith('TKTL')) {
+      type = 'TL';
+      arrangementText = `TL${input.slice(4)}`;
+    } else if (input.startsWith('TKDO')) {
+      type = 'DO';
+      arrangementText = `DO${input.slice(4)}`;
+    } else if (input.startsWith('TKIN')) {
+      type = 'IN';
+      arrangementText = `IN${input.slice(4)}`;
+    } else {
       return {
         ok: false,
         command: 'TK',
@@ -20,18 +33,16 @@ export const ticketingCommand: CommandHandler = {
       };
     }
 
-    const ticketingArrangement = match[1].trim();
-
     await updatePnrDraft(context.sessionId, (draft) => ({
       ...draft,
-      ticketingArrangement
+      ticketingArrangement: arrangementText
     }));
 
     return {
       ok: true,
       command: 'TK',
       echo: context.normalizedInput,
-      output: `TK ${ticketingArrangement}`
+      output: `TK ${arrangementText}`
     };
   }
 };

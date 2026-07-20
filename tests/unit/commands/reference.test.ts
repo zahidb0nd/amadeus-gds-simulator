@@ -5,11 +5,17 @@ import type { CommandHandlerContext } from '@/lib/commands/types';
 import { dcCommand } from '@/lib/commands/dc';
 
 describe('Reference Decode/Encode Commands', () => {
-  const createCtx = (input: string): CommandHandlerContext => ({
-    rawInput: input,
-    normalizedInput: input.toUpperCase(),
-    sessionId: 'test'
-  });
+  const createCtx = (input: string): CommandHandlerContext => {
+    const commandToken = input.slice(0, 3).toUpperCase();
+    const argument = input.slice(3);
+    return {
+      rawInput: input,
+      normalizedInput: input.toUpperCase(),
+      commandToken,
+      argument,
+      sessionId: 'test'
+    };
+  };
 
   describe('DAC (Airline Decode)', () => {
     it('should decode a valid airline code', async () => {
@@ -44,25 +50,25 @@ describe('Reference Decode/Encode Commands', () => {
   });
 
   describe('EAN (City/Airport Encode)', () => {
-    it('should encode a valid city name (single match)', () => {
+    it('should encode a valid city name (single match)', async () => {
       expect(eanCommand.match('EANDOHA')).toBe(true);
-      const result = eanCommand.execute(createCtx('EANDOHA'));
+      const result = await eanCommand.execute(createCtx('EANDOHA'));
       expect(result.ok).toBe(true);
       expect(result.output).toBe('DOH - HAMAD INTERNATIONAL, DOHA, QA');
     });
 
-    it('should encode a valid airport name (partial match, case-insensitive)', () => {
+    it('should encode a valid airport name (partial match, case-insensitive)', async () => {
       expect(eanCommand.match('EANkempegowda')).toBe(true);
-      const result = eanCommand.execute(createCtx('EANkempegowda'));
+      const result = await eanCommand.execute(createCtx('EANkempegowda'));
       expect(result.ok).toBe(true);
       expect(result.output).toBe('BLR - KEMPEGOWDA INTERNATIONAL, BENGALURU, IN');
     });
 
-    it('should return multiple matches if query is ambiguous', () => {
+    it('should return multiple matches if query is ambiguous', async () => {
       // Both Delhi and Dubai have 'D' and 'I' etc, let's query 'IN'
       // 'IN' matches 'Indira Gandhi International', 'Kempegowda International', 'Dubai International', 'Hamad International'
       expect(eanCommand.match('EANINTERNATIONAL')).toBe(true);
-      const result = eanCommand.execute(createCtx('EANINTERNATIONAL'));
+      const result = await eanCommand.execute(createCtx('EANINTERNATIONAL'));
       expect(result.ok).toBe(true);
       expect(result.output).toContain('BLR');
       expect(result.output).toContain('DOH');
@@ -70,16 +76,16 @@ describe('Reference Decode/Encode Commands', () => {
       expect(result.output).toContain('DEL');
     });
 
-    it('should return NOT FOUND for unknown city', () => {
+    it('should return NOT FOUND for unknown city', async () => {
       expect(eanCommand.match('EANATLANTIS')).toBe(true);
-      const result = eanCommand.execute(createCtx('EANATLANTIS'));
+      const result = await eanCommand.execute(createCtx('EANATLANTIS'));
       expect(result.ok).toBe(false);
       expect(result.output).toBe('NOT FOUND');
     });
 
-    it('should encode a newly imported airport city name (JFK / New York)', () => {
+    it('should encode a newly imported airport city name (JFK / New York)', async () => {
       expect(eanCommand.match('EANNEW YORK')).toBe(true);
-      const result = eanCommand.execute(createCtx('EANNEW YORK'));
+      const result = await eanCommand.execute(createCtx('EANNEW YORK'));
       expect(result.ok).toBe(true);
       expect(result.output).toContain('JFK');
     });
@@ -96,14 +102,14 @@ describe('Reference Decode/Encode Commands', () => {
       expect(resultKef.output).toBe('KEF - KEFLAVIK NAS, KEFLAVIK, IS');
     });
 
-    it('should decode/encode newly imported countries', () => {
+    it('should decode/encode newly imported countries', async () => {
       // Decode country code
-      const resultGl = dcCommand.execute(createCtx('DCGL'));
+      const resultGl = await dcCommand.execute(createCtx('DCGL'));
       expect(resultGl.ok).toBe(true);
       expect(resultGl.output).toBe('GL - GREENLAND');
 
       // Encode country name
-      const resultGreenland = dcCommand.execute(createCtx('DCGREENLAND'));
+      const resultGreenland = await dcCommand.execute(createCtx('DCGREENLAND'));
       expect(resultGreenland.ok).toBe(true);
       expect(resultGreenland.output).toBe('GREENLAND - GL');
     });

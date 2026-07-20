@@ -69,6 +69,13 @@ describe('Date/Time & Math Utilities (Phase B)', () => {
       expect(result.ok).toBe(false);
       expect(result.output).toBe('INVALID FORMAT');
     });
+
+    it('should convert time from LAX to MUC correctly with DST (9-hour offset in July)', async () => {
+      const ctx = createCtx('DDLAX1500/MUC', 'LAX1500/MUC');
+      const result = await ddCommand.execute(ctx);
+      expect(result.ok).toBe(true);
+      expect(result.output).toBe('LAX 1500 / MUC 0000 (+1D)');
+    });
   });
 
   describe('DF Command - Math Utilities', () => {

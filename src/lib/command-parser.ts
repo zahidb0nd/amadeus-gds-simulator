@@ -41,6 +41,12 @@ export function tokenizeCommand(input: string): ParsedCommand | null {
   } else if (normalizedInput.startsWith('DRT')) {
     commandToken = 'DRT';
     argument = normalizedInput.slice(3).trim();
+  } else if (normalizedInput.startsWith('TKDO')) {
+    commandToken = 'TKDO';
+    argument = normalizedInput.slice(4).trim();
+  } else if (normalizedInput.startsWith('TKIN')) {
+    commandToken = 'TKIN';
+    argument = normalizedInput.slice(4).trim();
   } else if (
     normalizedInput.startsWith('TN') ||
     normalizedInput.startsWith('DC') ||

@@ -42,3 +42,13 @@ if (!process.env.MONGODB_URI) {
 		// });
 	}
 }
+
+afterAll(async () => {
+	try {
+		const { getMongoClient } = require('./src/lib/mongodb');
+		const client = await getMongoClient();
+		await client.close();
+	} catch {
+		// No shared client was opened during the test run.
+	}
+});

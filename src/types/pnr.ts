@@ -49,6 +49,7 @@ export type PnrDraft = {
   contact?: string;
   ticketingArrangement?: string;
   tst?: TstQuote;
+  receivedFrom?: string;
 };
 
 export type PnrDocument = {
@@ -66,6 +67,7 @@ export type PnrDocument = {
     currency: string;
     processedAt: Date;
   };
+  receivedFrom?: string;
   status: 'ACTIVE' | 'TICKETED' | 'CANCELLED' | 'REFUNDED';
   createdAt: Date;
 };

@@ -9,7 +9,7 @@ export type Airport = {
   timezone?: string;
 };
 
-export const airports: Airport[] = [
+const rawAirports: Airport[] = [
   {
     "code": "1Z8",
     "name": "ENEWETAK AUX AF",
@@ -7689,12 +7689,12 @@ export const airports: Airport[] = [
   },
   {
     "code": "EZE",
-    "name": "N/A",
+    "name": "MINISTRO PISTARINI INTERNATIONAL",
     "city": "BUENOS AIRES",
     "country": "AR",
-    "latDec": 0,
-    "lonDec": 0,
-    "altitude": 0
+    "latDec": -34.822,
+    "lonDec": -58.536,
+    "altitude": 20
   },
   {
     "code": "EZS",
@@ -10371,7 +10371,7 @@ export const airports: Airport[] = [
   },
   {
     "code": "HND",
-    "name": "TOKYO INTERNATIONAL",
+    "name": "TOKYO HANEDA INTERNATIONAL",
     "city": "TOKYO",
     "country": "JP",
     "latDec": 35.552,
@@ -14554,15 +14554,7 @@ export const airports: Airport[] = [
     "lonDec": 0,
     "altitude": 0
   },
-  {
-    "code": "LHR",
-    "name": "N/A",
-    "city": "LONDON",
-    "country": "GB",
-    "latDec": 0,
-    "lonDec": 0,
-    "altitude": 0
-  },
+
   {
     "code": "LHR",
     "name": "HEATHROW",
@@ -18219,12 +18211,12 @@ export const airports: Airport[] = [
   },
   {
     "code": "NBO",
-    "name": "N/A",
+    "name": "JOMO KENYATTA INTERNATIONAL",
     "city": "NAIROBI",
     "country": "KE",
-    "latDec": 0,
-    "lonDec": 0,
-    "altitude": 0
+    "latDec": -1.319,
+    "lonDec": 36.928,
+    "altitude": 1624
   },
   {
     "code": "NBX",
@@ -25518,7 +25510,7 @@ export const airports: Airport[] = [
   },
   {
     "code": "SYD",
-    "name": "KINGSFORD SMITH INTERNATIONAL AIRPORT",
+    "name": "SYDNEY KINGSFORD SMITH INTERNATIONAL AIRPORT",
     "city": "SYDNEY",
     "country": "AU",
     "latDec": -33.946,
@@ -32069,6 +32061,8 @@ export const airports: Airport[] = [
     "altitude": 1255
   }
 ];
+
+export const airports: Airport[] = rawAirports.filter(a => a.name !== 'N/A');
 
 export function getAirport(code: string) {
   return airports.find((airport) => airport.code === code.toUpperCase());

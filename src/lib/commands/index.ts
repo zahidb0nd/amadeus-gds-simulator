@@ -22,6 +22,7 @@ import { ddCommand } from './dd';
 import { dfCommand } from './df';
 import { availabilityNavCommand } from './availability-nav';
 import { flightInfoCommand } from './flight-info';
+import { rfCommand } from './rf';
 import type { CommandHandler } from './types';
 
 export const commandHandlers: CommandHandler[] = [
@@ -41,6 +42,7 @@ export const commandHandlers: CommandHandler[] = [
   nameCommand,
   contactCommand,
   ticketingCommand,
+  rfCommand,
   farePricingCommand,
   ticketIssueCommand,
   ticketVoidCommand,

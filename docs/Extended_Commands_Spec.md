@@ -50,13 +50,17 @@ Simple, self-contained, no PNR/session dependency. Good "quick win" phase — th
 |---|---|
 | `DD<City Code>` | Current date/time in a city (needs timezone-per-airport data) |
 | `DD<Date>` | Day of week for a date |
-| `DD<Date>+<Days>` / `DD<Date>-<Days>` | Date math |
-| `DF<A>;<B>` | Add |
+| `DD<Date>+<Days>` / `DD<Date>-<Days>` / `DD<Date>/+<Days>` / `DD<Date>/-<Days>` | Date math (supports both slash and no-slash syntax) |
+| `DD<City><Time>/<City2>` | Time conversion between two cities at a specific time (e.g. `DDLAX1500/MUC`) |
+| `DD<City1>/<City2>` | Time difference between two cities (e.g. `DDOSA/DEL`) |
+| `DD<City1><Time>/<City2><Time>[+Days]` | Elapsed flight time calculation (e.g. `DDNCE1800/SYD0500+2`) |
+| `DF<A>;<B>[;<C>;...]` | Multiple additions (e.g. `DF134;55;21`) |
 | `DF<A>-<B>` | Subtract |
 | `DF<A>*<B>` | Multiply |
 | `DF<A>/<B>` | Divide |
+| `DF<A>P<B>` | Percentage calculation (e.g. `DF513P10`) |
 
-**Data needed:** `DD<City Code>` requires a timezone field on `airports` — worth adding now since it's a small addition with reuse value later (flight times could eventually respect timezones too).
+**Data needed:** `DD<City Code>` and other `DD` variants require a timezone field on `airports` — already added.
 
 ---
 
@@ -115,14 +119,13 @@ Extends `AP`/`TK`/`ER` (already built) with realistic variants.
 | `APM-<Mobile>` | Passenger mobile (distinct from agency phone) |
 | `APE-<Email>` | Passenger email |
 | `TKOK` | Ticket today |
-| `TKTL<Date>` | Ticketing time limit |
-| `TKXL<Date>` | Auto-cancel if not ticketed by date |
-| `RF<Initials>` | Received-from agent initials |
+| `TKTL<Date>` / `TKDO<Date>` / `TKIN<Date>` | Ticketing arrangement limits (general/domestic/international) |
+| `RF<free text>` | Received-from free-text signer |
 | `ET` | End transaction + complete (vs `ER`'s redisplay) |
 | `RTAXR`, `SP<PaxNum>`, `EF` | PNR splitting (advanced — consider skipping, low learner value) |
-| `RTG` / `RTI` / `RTR` | Partial PNR display (general/itinerary/remarks only) |
+| `RTA` / `RTI` / `RTG` / `RTN` / `RTP` / `RTH,C` / `RTK,J` / `RTSVC` | Partial PNR displays (air segments, itinerary, general facts, names, passenger data, hotel/car, ticketing/contact, service details) |
 
-**Recommend:** build the contact/ticketing variants (`APM`, `APE`, `TKOK`, `TKTL`, `TKXL`, `RF`, `ET`) — genuinely useful and low complexity. **Skip PNR splitting** (`SP`/`EF`/`RTAXR`) — real edge-case functionality, disproportionate complexity for a portfolio project.
+**Recommend:** build the contact/ticketing variants (`APM`, `APE`, `TKOK`, `TKTL`, `TKDO`, `TKIN`, `RF`, `ET`) — genuinely useful and low complexity. **Skip PNR splitting** (`SP`/`EF`/`RTAXR`) — real edge-case functionality, disproportionate complexity for a portfolio project. Of the RT partial displays, RTA/RTI/RTG/RTN are the most useful subset to build first.
 
 ---
 

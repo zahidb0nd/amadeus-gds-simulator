@@ -39,7 +39,7 @@ export const dacCommand: CommandHandler = {
 
     const airport = await findAirportByCode(arg);
 
-    if (!airport) {
+    if (!airport || !airport.name || airport.name.trim() === '' || airport.name.trim() === 'N/A') {
       return {
         ok: false,
         command: 'DAC',

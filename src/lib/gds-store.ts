@@ -191,6 +191,7 @@ const airportTimezones: Record<string, string> = {
   NRT: 'Asia/Tokyo',
   SIN: 'Asia/Singapore',
   SYD: 'Australia/Sydney',
+  MUC: 'Europe/Berlin',
 };
 
 const countryTimezones: Record<string, string> = {
@@ -203,6 +204,7 @@ const countryTimezones: Record<string, string> = {
   JP: 'Asia/Tokyo',
   SG: 'Asia/Singapore',
   AU: 'Australia/Sydney',
+  DE: 'Europe/Berlin',
 };
 
 export async function ensureAirportSeeds(): Promise<void> {
@@ -218,7 +220,14 @@ export async function ensureAirportSeeds(): Promise<void> {
       const tz = airportTimezones[a.code.toUpperCase()] || countryTimezones[a.country.toUpperCase()] || 'UTC';
       return { ...a, timezone: tz };
     });
-    await airportsCollection.insertMany(seededAirports as any[]);
+    const ops = seededAirports.map(a => ({
+      updateOne: {
+        filter: { code: a.code },
+        update: { $setOnInsert: a },
+        upsert: true
+      }
+    }));
+    await airportsCollection.bulkWrite(ops);
   } else {
     const sample = await airportsCollection.findOne({ code: 'BLR' });
     if (sample && !('timezone' in sample)) {
@@ -347,7 +356,14 @@ export async function ensureFlightSeeds(): Promise<void> {
       aircraft: f.aircraft,
       classes: Object.entries(f.classes).map(([c, s]) => ({ class: c, seats: s }))
     }));
-    await flightsCollection.insertMany(mapped);
+    const ops = mapped.map((f) => ({
+      updateOne: {
+        filter: { carrierCode: f.carrierCode, flightNumber: f.flightNumber, origin: f.origin, destination: f.destination },
+        update: { $setOnInsert: f },
+        upsert: true
+      }
+    }));
+    await flightsCollection.bulkWrite(ops);
   } else {
     const sample = await flightsCollection.findOne({ aircraft: { $exists: false } });
     if (sample) {
@@ -362,7 +378,14 @@ export async function ensureFlightSeeds(): Promise<void> {
         aircraft: f.aircraft,
         classes: Object.entries(f.classes).map(([c, s]) => ({ class: c, seats: s }))
       }));
-      await flightsCollection.insertMany(mapped);
+      const ops = mapped.map((f) => ({
+        updateOne: {
+          filter: { carrierCode: f.carrierCode, flightNumber: f.flightNumber, origin: f.origin, destination: f.destination },
+          update: { $setOnInsert: f },
+          upsert: true
+        }
+      }));
+      await flightsCollection.bulkWrite(ops);
       console.log('Migrated flights collection with aircraft data.');
     }
   }
